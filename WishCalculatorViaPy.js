@@ -84,11 +84,11 @@ export class WishCalculator extends plugin {
 
         exec(`python plugins\\example\\WishSupport.py ${IntertwinedFateNum} ${ExpectedCharacterNum} ${CharacterPoolGuarantee} ${CharacterPoolStage} ${ExpectedWeaponNum} ${WeaponPoolGuarantee} ${WeaponPoolStage} ${BindingNum}`,{ windowsHide: true },(error, stdout, stderr) => {
             if (error) {
-                console.log(`[Error]: ${error.message}`)
+                console.log(`[Error]: ${error}`)
                 return
             }
             if (stderr) {
-                console.log(`[Std Error]: ${error.message}`)
+                console.log(`[Std Error]: ${stderr}`)
                 return
             }
             let results = stdout.split(" ")
