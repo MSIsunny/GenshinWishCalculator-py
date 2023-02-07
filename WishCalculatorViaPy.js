@@ -16,7 +16,7 @@ export class WishCalculator extends plugin {
                 fnc: "calculate",
             },
             {
-                reg: /^#*(概率|期望|计算)$/,
+                reg: /^#*(概率|期望|计算|概率计算)$/,
                 fnc: "help",
             }
         ]
@@ -50,6 +50,10 @@ export class WishCalculator extends plugin {
             await e.reply("非法数据，命定值大于2")
             return
         }
+        if (parseInt(numbers[1]) + parseInt(numbers[4]) == 0) {
+            await e.reply("你什么都不抽，我怎么帮你计算")
+            return
+        }
         // #拥有的纠缠之缘数量
         let IntertwinedFateNum = parseInt(numbers[0])
         // #期望抽到角色数（0-7）
@@ -68,56 +72,58 @@ export class WishCalculator extends plugin {
         let BindingNum = parseInt(numbers[7])
 
         let nickname = e.sender.card
-        // let rep=`1、拥有粉球数（${IntertwinedFateNum}）\n`+
-        //         `2、期望抽到角色数（${ExpectedCharacterNum}）\n`+
-        //         `3、角色池是否大保底（${CharacterPoolGuarantee == 0 ? false : true}）\n`+
-        //         `4、角色池当前水位（${CharacterPoolStage}）\n`+
-        //         `5、期望抽到武器数（${ExpectedWeaponNum}）\n`+
-        //         `6、武器池是否大保底（${WeaponPoolGuarantee == 0 ? false : true}）\n`+
-        //         `7、武器池当前水位（${WeaponPoolStage}）\n`+
-        //         `8、武器池命定值（${BindingNum}）\n`
-        let rep = ""
-        if (ExpectedCharacterNum != 0) {
-            rep = rep + `开始为${nickname}计算抽取${ExpectedCharacterNum-1}命${ExpectedWeaponNum}精的概率`
+        let rep = " "
+        if (ExpectedCharacterNum == 0) {
+            rep = `开始为${nickname}计算抽取${ExpectedWeaponNum}精的概率`
+        } else if (ExpectedWeaponNum == 0) {
+            rep = `开始为${nickname}计算抽取${ExpectedCharacterNum-1}命的概率`
         } else {
-            rep = rep + `开始为${nickname}计算抽取${ExpectedWeaponNum}精的概率`
+            rep = `开始为${nickname}计算抽取${ExpectedCharacterNum-1}命${ExpectedWeaponNum}精的概率`
         }
         await e.reply(rep)
 
         exec(`python plugins\\example\\WishSupport.py ${IntertwinedFateNum} ${ExpectedCharacterNum} ${CharacterPoolGuarantee} ${CharacterPoolStage} ${ExpectedWeaponNum} ${WeaponPoolGuarantee} ${WeaponPoolStage} ${BindingNum}`,{ windowsHide: true },(error, stdout, stderr) => {
             if (error) {
                 console.log(`[Error]: ${error.message}`)
+                return
+            }
+            if (stderr) {
+                console.log(`[Std Error]: ${error.message}`)
+                return
             }
             let results = stdout.split(" ")
             let percentage = Number(results[0])
-            let msg = " "
+            let msg = `\n${IntertwinedFateNum}抽达到预期的概率为${results[0]}%\n`
+            if (parseInt(numbers[0]) == 0) {
+                msg = " \n"
+            }
             if (percentage<10) {
-                msg = `\n${IntertwinedFateNum}抽达到预期的概率为${results[0]}%\n`+
+                msg = msg+
                 `达成10%概率需要${results[1]}抽\n`+
                 `达成25%概率需要${results[2]}抽\n`+
                 `达成50%概率需要${results[3]}抽\n`+
                 `达成75%概率需要${results[4]}抽\n`+
                 `达成90%概率需要${results[5]}抽`
             } else if (percentage<25) {
-                msg = `\n${IntertwinedFateNum}抽达到预期的概率为${results[0]}%\n`+
+                msg = msg+
                 `达成25%概率需要${results[2]}抽\n`+
                 `达成50%概率需要${results[3]}抽\n`+
                 `达成75%概率需要${results[4]}抽\n`+
                 `达成90%概率需要${results[5]}抽`
             } else if (percentage<50) {
-                msg = `\n${IntertwinedFateNum}抽达到预期的概率为${results[0]}%\n`+
+                msg = msg+
                 `达成50%概率需要${results[3]}抽\n`+
                 `达成75%概率需要${results[4]}抽\n`+
                 `达成90%概率需要${results[5]}抽`
             } else if (percentage<75) {
-                msg = `\n${IntertwinedFateNum}抽达到预期的概率为${results[0]}%\n`+
+                msg = msg+
                 `达成75%概率需要${results[4]}抽\n`+
                 `达成90%概率需要${results[5]}抽`
             } else if (percentage<90) {
-                msg = `\n${IntertwinedFateNum}抽达到预期的概率为${results[0]}%\n`+
+                msg = msg+
                 `达成90%概率需要${results[5]}抽`
             } else {
-                msg = `\n${IntertwinedFateNum}抽达到预期的概率为${results[0]}%\n`
+                msg = msg
             }
             e.reply([segment.at(e.user_id),msg])
         })
@@ -128,7 +134,7 @@ export class WishCalculator extends plugin {
     async help(e) {
         let title = "祈愿预期概率计算帮助"
         let body = "按照如下顺序提供数据：\n"+
-                    "1、拥有粉球数（1-1500）\n"+
+                    "1、拥有粉球数（0-1500）\n"+
                     "2、期望抽到角色数（0-7）\n"+
                     "3、角色池是否大保底（0/1）\n"+
                     "4、角色池当前水位（0-89）\n"+
