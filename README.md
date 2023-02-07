@@ -42,6 +42,12 @@ pip install -i https://pypi.tuna.tsinghua.edu.cn/simple numpy
 
 >注意：因为本插件的计算量比较大，为避免被用户滥用，默认不支持私聊，仅支持群聊使用
 
+## 已知问题
+
+>如果在终端中输入代码```python```出现诸如command not found: python之类的提示，但是输入代码```python3```可以正常进入python命令行交互模式
+
+>那么，请将WishCalculatorViaPy.js文件中85行附近的一处python改为python3
+
 ## 实现原理
 
 >使用转移概率矩阵计算祈愿概率，与迭代法模拟上万次抽卡不同，此方法得到的是精确结果，不存在随机涨落
