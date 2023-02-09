@@ -82,7 +82,7 @@ export class WishCalculator extends plugin {
         }
         await e.reply(rep)
 
-        exec(`python plugins\\example\\WishSupport.py ${IntertwinedFateNum} ${ExpectedCharacterNum} ${CharacterPoolGuarantee} ${CharacterPoolStage} ${ExpectedWeaponNum} ${WeaponPoolGuarantee} ${WeaponPoolStage} ${BindingNum}`,{ windowsHide: true },(error, stdout, stderr) => {
+        exec(`python plugins/example/WishSupport.py ${IntertwinedFateNum} ${ExpectedCharacterNum} ${CharacterPoolGuarantee} ${CharacterPoolStage} ${ExpectedWeaponNum} ${WeaponPoolGuarantee} ${WeaponPoolStage} ${BindingNum}`,{ windowsHide: true },(error, stdout, stderr) => {
             if (error) {
                 console.log(`[Error]: ${error}`)
                 return
